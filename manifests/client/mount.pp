@@ -23,7 +23,7 @@ define nfs::client::mount (
   $ensure = 'mounted',
   $server,
   $share,
-  $mount = $title,
+  $mount = undef,
   $remounts = false,
   $atboot = false,
   $options = '_netdev',
@@ -73,7 +73,11 @@ define nfs::client::mount (
      $_mount = $mount
     }
 
-    nfs::mkdir{"${_mount}": }
+    if $ensure == 'mounted' or $ensure == 'present' {
+      nfs::mkdir{"${_mount}": 
+        before => Mount["shared $share by $::clientcert"]
+      }
+    }
 
     mount {"shared $share by $::clientcert":
       ensure   => $ensure,
@@ -83,7 +87,6 @@ define nfs::client::mount (
       options  => $options,
       remounts => $remounts,
       atboot   => $atboot,
-      require  => Nfs::Mkdir["${_mount}"],
     }
 
 
