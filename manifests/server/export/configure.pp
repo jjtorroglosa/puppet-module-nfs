@@ -3,8 +3,14 @@ define nfs::server::export::configure (
   $clients
 ) {
 
+  if is_array($clients) {
+    $clients_real = join($clients, " ")
+  }else {
+    $clients_real = $clients
+  }
+
   if $ensure != 'absent' {
-    $line = "${name} ${clients}\n"
+    $line = "${name} ${clients_real}\n"
 
     concat::fragment{
       "${name}":
